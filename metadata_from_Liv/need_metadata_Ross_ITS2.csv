@@ -1,0 +1,43 @@
+sample_id,problem_identified,time,species,depth_ft,date_collected,site,gps
+CR31,data not properly recorded,present,,,7/2/21,Conch Reef,"24.948445, -80.462384"
+CR40,data not properly recorded,present,,,7/2/21,Conch Reef,"24.948445, -80.462384"
+KL178,information missing historical database (site),historical,DLAB,2.4,6/22/01,,
+KL339,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL342,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL343,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL344,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL345,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL348,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL349,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL360,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL366,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL367,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL374,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL375,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL376,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL377,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL378,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL379,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL38,does not exist in historical database,historical,,,,,
+KL396,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL400,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL403,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL406,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KL425,information missing historical database (site),historical,SINT,21,,,
+KL426,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL427,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL428,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL429,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL430,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL431,"information missing historical database (site, depth)",historical,SRAD,,,,
+KL470,"information missing historical database (species, site, depth, etc)",historical,,,,,
+KLCP78,data not properly recorded,present,,,10/12/20,Cheeca Patch,"24.90400, -80.61686"
+KLPR11,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+KLPR12,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+KLPR13,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+KLPR14,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+KLPR15,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+KLPR16,data not properly recorded,present,,,10/12/20,Pickles Reef,"24.98698, -80.41486"
+Tr12,data not properly recorded,present,,,7/2/21,Hens & Chickens (Tavernier Rocks),"24.935353, -80.549607"
+Tri21,data not properly recorded,present,,,7/2/21,Triangles Reef,"25.00874, -80.44978"
+Tri22,data not properly recorded,present,,,7/2/21,Triangles Reef,"25.00874, -80.44978"

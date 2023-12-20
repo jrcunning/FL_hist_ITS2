@@ -1,0 +1,281 @@
+---
+title: "tidy metadata"
+output: html_document
+date: "2023-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+# Historical collections
+hist <- readxl::read_xlsx("metadata_from_Liv/Key Largo historicals.xlsx") %>%
+  janitor::clean_names()
+hist <- hist %>%
+  mutate(collection = "historical") %>%
+  select(sample_id = cr2_id_number, date_sampled = date, site, species = host, 
+         depth_ft = depth_in_feet, collection, gps) %>%
+  drop_na(species, site) %>%
+  mutate(sample_id = gsub("-", "", sample_id)) %>%
+  #remove leading zeros
+  mutate(sample_num = parse_number(sample_id),
+         sample_id = paste0(str_sub(sample_id, 1, 2), sample_num)) %>%
+  select(-sample_num)
+
+# Contemporary collections
+
+# Collections done by Baker Lab in July 2021
+conch <- readxl::read_xlsx("metadata_from_Liv/KL_July2021_data.xlsx", sheet = "Conch") %>%
+  janitor::clean_names() %>%
+  mutate(date_sampled = date,
+         collection = "contemporary") %>%
+  select(sample_id = bag_number, date_sampled, site, species,
+         depth_ft = depth_actual, collection, gps = coordinates_dd)
+
+tav <- readxl::read_xlsx("metadata_from_Liv/KL_July2021_data.xlsx", sheet = "Tav Rox") %>%
+  janitor::clean_names() %>%
+  mutate(date_sampled = date,
+         collection = "contemporary") %>%
+  select(sample_id = bag_number, date_sampled, site, species,
+         depth_ft = depth_actual, collection, gps = coordinates_dd) %>%
+  mutate(sample_id = gsub("∆", "Tri", sample_id),      # confirm with Liv that samples from TavRox are labeled with Triangle...
+         sample_id = gsub("TR", "Tr", sample_id))
+
+tri <- readxl::read_xlsx("metadata_from_Liv/KL_July2021_data.xlsx", sheet = "Triangles") %>%
+  janitor::clean_names() %>%
+  mutate(date_sampled = date,
+         collection = "contemporary") %>%
+  select(sample_id = bag_number, date_sampled, site, species,
+         depth_ft = depth_actual, collection, gps = coordinates_dd) %>%
+  mutate(sample_id = gsub("∆", "Tri", sample_id))
+
+# Collections done on Coral Reef II in October 2020
+cheeca <- readxl::read_xlsx("metadata_from_Liv/data1.xlsx", sheet = "Cheeca P") %>%
+  janitor::clean_names() %>%
+  mutate(date_sampled = as_date("2020-10-12"),
+         collection = "contemporary") %>%
+  select(sample_id = bag_number, date_sampled, site, species,
+         depth_ft = depth_actual, collection) %>%
+  mutate(sample_id = gsub("CP", "KLCP", sample_id),
+         gps = c("24.90400, -80.61686"))  # GUESSING
+
+pick <- readxl::read_xlsx("metadata_from_Liv/data1.xlsx", sheet = "Pickles") %>%
+  janitor::clean_names() %>%
+  mutate(date_sampled = as_date("2020-10-12"),
+         collection = "contemporary") %>%
+  select(sample_id = bag_number, date_sampled, site, species,
+         depth_ft = depth_actual, collection) %>%
+  mutate(sample_id = gsub("PR", "KLPR", sample_id),
+         gps = c("24.98698, -80.41486"))
+
+# Missing metadata from Liv 2023-12-07
+miss <- read_csv("metadata_from_Liv/need_metadata_Ross_ITS2.csv")
+miss <- miss %>%
+  mutate(date_sampled = as_date(date_collected, format = "%m/%d/%y")) %>%
+  mutate(collection = case_when(time == "present" ~ "contemporary",
+                                time == "historical" ~ "historical")) %>%
+  select(sample_id, date_sampled, site, species, depth_ft, collection, gps)
+```
+
+```{r}
+# Combine all sample metadata
+samp <- bind_rows(hist, conch, tav, tri, cheeca, pick, miss)
+
+# Update historical species names and correct misspellings
+samp <- samp %>%
+  mutate(species = case_when(species == "Dichocoenia stellata" ~ "Dichocoenia stokesii",
+                              species == "Diploria clivosa" ~ "Pseudodiploria clivosa",
+                              species == "Diploria strigosa" ~ "Pseudodiploria strigosa",
+                              species == "M. areolata" ~ "Manicina areolata",
+                              species == "Manicinia areolata" ~ "Manicina areolata",
+                              species == "Montastraea faveolata" ~ "Orbicella faveolata",
+                              species == "Montastrea annularis" ~ "Orbicella annularis",
+                              species == "Montastrea cavernosa" ~ "Montastraea cavernosa",
+                              species == "Montastrea faveolata" ~ "Orbicella faveolata",
+                              species == "S. hyades" ~ "Solenastrea hyades",
+                              TRUE ~ species))
+
+# Transform species names
+samp <- samp %>%
+  mutate(species = case_when(species == "DLAB" ~ "Diploria labyrinthiformis",
+                              species == "EFAS" ~ "Eusmilia fastigiata",
+                              species == "MCAV" ~ "Montastraea cavernosa",
+                              species == "MDEC" ~ "Madracis decactis",
+                              species == "OFAV" ~ "Orbicella faveolata",
+                              species == "PAST" ~ "Porites astreoides",
+                              species == "PPOR" ~ "Porites porites",
+                              species == "PSTR" ~ "Pseudodiploria strigosa",
+                              species == "SINT" ~ "Stephanocoenia intersepta",
+                              species == "SRAD" ~ "Siderastrea radians",
+                              species == "SSID" ~ "Siderastrea siderea",
+                              species == "CNAT" ~ "Colpophyllia natans",
+                              species == "DSTE" ~ "Dichocoenia stokesii",
+                              species == "DSTO" ~ "Dichocoenia stokesii", 
+                              species == "MALI" ~ "Mycetophyllia aliciae",
+                              species == "MANG" ~ "Mussa angulosa",
+                              species == "OANN" ~ "Orbicella annularis",
+                              species == "PCLI" ~ "Pseudodiploria clivosa",
+                              species == "SBOU" ~ "Solenastrea bournoni",
+                              species == "SHYA" ~ "Solenastrea hyades",
+                              species == "AAGA" ~ "Agaricia agaricites",
+                              species == "MCOM" ~ "Millepora complanata",
+                              TRUE ~ species))
+
+#samp %>% distinct(species) %>% print(n = nrow(.))
+```
+
+
+
+
+```{r}
+# Metadata for what we sequenced
+seq <- read_csv("miseq_sample_sheet/SampleSheet_Pawar_20230613.csv", skip = 13) %>%
+  janitor::clean_names()
+# Filter out Shayle's samples
+seq <- seq %>%
+  filter(!grepl("^[A]|^[2].*", sample_id))
+
+# adjust sample names
+seq <- seq %>%
+  mutate(sample_id_forseq = sample_id) %>%
+  mutate(sample_id2 = gsub("-", "", sample_id),    # remove hyphens
+         sample_id = gsub("[a-zA-Z]+$", "", sample_id2)) %>% # removing "A", "B", "foamy", etc. from end of sampleID
+  #remove leading zeros
+  mutate(sample_num = parse_number(sample_id),
+         sample_id2 = str_extract(sample_id, "^([[:alpha:]]*)"),
+         sample_id = paste0(sample_id2, sample_num))
+
+joined <- left_join(seq, samp)
+
+# Check if any sequenced samples are missing metadata
+anti_join(seq, samp) %>%
+  select(sample_id)
+
+# Tidy site names
+joined %>% distinct(site) %>%
+  arrange(site)
+
+joined <- joined %>%
+  mutate(site = case_when(site %in% c("Cheeca", "Cheeca Patch", "Chica Patch") ~ "Cheeca",
+                          site %in% c("Conch - Public", "Conch Reef") ~ "Conch",
+                          site %in% c("Hens & Chicken (Tav Rocks)",
+                                      "Hens & Chickens (Tavernier Rocks)",
+                                      "Tavernier Rocks") ~ "Tavernier Rocks",
+                          site %in% c("Pickles", "Pickles Reef", 
+                                      "Pickles Reef P2 (mooring buoy 2)") ~ "Pickles",
+                          site %in% c("Triangles", "Triangles Reef") ~ "Triangles",
+                          TRUE ~ site))
+```
+
+# Create SymPortal metadata sheet
+```{r}
+# Separate species binomials into genus and species
+joined <- joined %>%
+  separate(species, into = c("host_genus", "host_species"))
+
+# Remove non-scleractinians
+scler <- joined %>%
+  filter(!host_genus %in% c("Biareum", "Retracting", "Anemone", "Symbiotic", "C"))
+
+# Fill in taxonomy information
+scler <- scler %>%
+  mutate(host_phylum = "Cnidaria",
+         host_class = "Anthozoa",
+         host_order = case_when(host_genus == "Millepora" ~ "Anthoathecata",
+                                is.na(host_genus) ~ "Scleractinia",  # Assume samples with missing metadata are scler
+                                TRUE ~ "Scleractinia"),
+         host_family = case_when(host_genus == "Siderastrea" ~ "Rhizangiidae",
+                                 host_genus %in% c("Diploria", "Pseudodiploria", 
+                                                   "Mussa", "Colpophyllia",
+                                                   "Mycetophyllia") ~ "Faviidae",
+                                 host_genus == "Stephanocoenia" ~ "Astrocoeniidae",
+                                 host_genus == "Porites" ~ "Poritidae",
+                                 host_genus == "Orbicella" ~ "Merulinidae",
+                                 host_genus == "Montastraea" ~ "Montastraeidae",
+                                 host_genus == "Madracis" ~ "Pocilloporidae",
+                                 host_genus %in%  c("Dichocoenia", "Eusmilia",
+                                                    "Meandrina") ~ "Meandrinidae",
+                                 host_genus == "Solenastrea" ~ "Scleractinia incertae sedis",
+                                 host_genus == "Agaricia" ~ "Agariciidae",
+                                 host_genus == "Millepora" ~ "Milleporidae",
+                                 host_genus == "Oculina" ~ "Oculinidae",
+                                 host_genus == "Cladocora" ~ "Cladocoridae"))
+
+# Get .fastq filenames
+fastq <- basename(list.files("Pawar_20230613-390999058", pattern = ".fastq.gz", recursive = TRUE, full.names = FALSE))
+forward <- grep("R1", fastq, value = TRUE)
+reverse <- grep("R2", fastq, value = TRUE)
+filenames <- bind_cols(fastq_fwd_file_name = forward, 
+                       fastq_rev_file_name = reverse) %>%
+  mutate(sample_name = str_extract(fastq_fwd_file_name, "[^_]+"))
+# Join fastq filenames to rest of data
+scler <- scler %>% 
+  rename(sample_name = sample_id_forseq) %>%
+  left_join(filenames)
+
+# Convert dates
+scler <- scler %>%
+  mutate(collection_date = format(date_sampled, "%Y%m%d"))
+
+# Convert coordinates
+scler <- scler %>%
+  separate(gps, into = c("collection_latitude", "collection_longitude"), sep = ",")
+
+# Add other metadata for symportal
+symportal <- scler %>%
+  mutate(sample_type = "coral_field") %>%
+  select(sample_name, fastq_fwd_file_name, fastq_rev_file_name, sample_type, 
+         host_phylum, host_class, host_order, host_family, host_genus, host_species,
+         collection_latitude, collection_longitude, collection_date,
+         collection_depth = depth_ft,
+         collection_site = site,
+         collection_batch = collection)
+
+#View(symportal)
+
+write_csv(symportal, file = "Symportal_metadata_20231220.csv")
+```
+
+
+
+
+# How m
+```{r}
+test <- symportal %>%
+  mutate(collection_batch = factor(collection_batch, levels = c("historical", "contemporary"))) %>%
+  group_by(collection_batch, collection_site) %>%
+  count(host_species)# %>%
+  #filter(n >= 3)
+
+ggplot(test, aes(x = collection_site, y = n)) + geom_col() +
+  facet_grid(host_species~collection_batch, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 45))
+
+ggplot(test, aes(x = collection_batch, y = n, fill = host_species)) +
+  geom_col() +
+  facet_wrap(~collection_site) +
+  #scale_fill_brewer(palette = "Pastel1") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# only species with more samples
+test2 <- symportal %>%
+  mutate(collection_batch = factor(collection_batch, levels = c("historical", "contemporary"))) %>%
+  group_by(collection_batch, collection_site) %>%
+  count(host_species) %>%
+  filter(n >= 2)
+
+ggplot(test2, aes(x = collection_batch, y = n, fill = host_species)) +
+  geom_col() +
+  facet_wrap(~collection_site) +
+  #scale_fill_brewer(palette = "Pastel1") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
